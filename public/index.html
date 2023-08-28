@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatiable" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hexi</title>
+    <link rel="stylesheet" href="./static/css/style.css" />
+    <script src="./static/bundle/script.js" defer></script>
+  </head>
+  <body>
+    <!-- <span id="data-test">Nothing received yet...</span> -->
+
+    <div id="layout">
+      <header>
+        <div id="header-inner">
+          <div id="title"><h1>Hexipro</h1></div>
+          <div id="controls">
+            <div id="controls-inner">
+              <button class="end-attack control" id="endAttack">
+                End Attack
+              </button>
+              <button class="end-turn control" id="endTurn">End Turn</button>
+            </div>
+          </div>
+        </div>
+      </header>
+      <div class="divide-wrapper"></div>
+      <main>
+        <canvas id="canvas">
+      </main>
+    </div>
+
+    <div id="details">
+      <p>
+        <b id="attack-stage-label">attack stage: </b>Select one of your tiles to attack with, and click another to take over.
+      </p>
+      <p>
+        <b id="allocate-stage-label">allocate stage: </b>Click on your own tiles to power them up for the next round.
+      </p>
+      <p>
+        Player: <span id="player">PLAYER</span><br />
+        Stage: <span id="stage">STAGE</span><br />
+        Power: <span id="power">POWER</span>
+        <ul id="server-messages"></ul>
+      </p>
+      <h3 id="winner"></h3>
+      <button id="resetGame" class="reset-game control">Reset Game</button>
+    </div>
+
+  </body>
+</html>
