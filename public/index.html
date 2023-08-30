@@ -27,26 +27,60 @@
       </header>
       <div class="divide-wrapper"></div>
       <main>
-        <canvas id="canvas">
+        <canvas id="canvas" />
       </main>
     </div>
 
     <div id="details">
-      <p>
-        <b id="attack-stage-label">attack stage: </b>Select one of your tiles to attack with, and click another to take over.
-      </p>
-      <p>
-        <b id="allocate-stage-label">allocate stage: </b>Click on your own tiles to power them up for the next round.
-      </p>
-      <p>
-        Player: <span id="player">PLAYER</span><br />
-        Stage: <span id="stage">STAGE</span><br />
-        Power: <span id="power">POWER</span>
-        <ul id="server-messages"></ul>
-      </p>
-      <h3 id="winner"></h3>
-      <button id="resetGame" class="reset-game control">Reset Game</button>
+      <div id="details-header">
+        <h2 id="details-toggle">
+          Details Panel
+          <span id="details-toggle-label">[Hide]</span>
+        </h2>
+      </div>
+      <div id="details-inner">
+        <h3 id="winner"></h3>
+        <p>
+          Player: <span id="player">PLAYER</span><br />
+          Stage: <span id="stage">STAGE</span><br />
+          Power: <span id="power">POWER</span>
+        </p>
+        <span id="details-help">
+          <span id="details-help-attack">
+            <b id="attack-stage-label">attack stage: </b>Select one of your
+            tiles to attack with, and click another to take over.
+          </span>
+          <br />
+          <span id="details-help-allocate">
+            <b id="allocate-stage-label">allocate stage: </b>Click on your own
+            tiles to power them up for the next round.
+          </span>
+        </span>
+
+        <span id="details-log">
+          <ul id="server-messages"></ul>
+        </span>
+
+        <button id="resetGame" class="reset-game control">Reset Game</button>
+      </div>
     </div>
 
+    <script type="text/javascript">
+      const detailsPanel = document.getElementById('details-inner');
+      const detailsToggle = document.getElementById('details-toggle');
+      const detailsToggleLabel = document.getElementById(
+        'details-toggle-label'
+      );
+
+      detailsToggle.addEventListener('click', () => {
+        if (detailsPanel.style.display === 'none') {
+          detailsPanel.style.display = 'block';
+          detailsToggleLabel.innerHTML = '[Hide]';
+        } else {
+          detailsPanel.style.display = 'none';
+          detailsToggleLabel.innerHTML = '[Show]';
+        }
+      });
+    </script>
   </body>
 </html>

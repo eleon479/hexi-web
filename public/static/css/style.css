@@ -143,6 +143,7 @@ main {
   left: 0;
   padding: 15px;
   z-index: 3;
+  font-size: 12px;
 }
 
 h2,
@@ -275,4 +276,26 @@ ul {
 
 b {
   color: var(--hexipro-green);
+}
+
+#details-inner {
+  /* add a light, translucent background */
+  background-color: rgba(88, 88, 88, 0.5);
+}
+
+#details-toggle-label {
+  color: var(--hexipro-blue);
+}
+
+#details-toggle-label:hover {
+  color: var(--hexipro-indigo);
+}
+
+#details-toggle-label:visited {
+  /* remove default styling */
+  color: var(--hexipro-blue);
+}
+
+#details-toggle-label:active {
+  color: var(--hexipro-indigo);
 }

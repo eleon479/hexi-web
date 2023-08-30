@@ -45,15 +45,6 @@ class Client {
   public connect() {
     console.log('client: connect()');
 
-    // make sure server acknowledges connection
-    // set up empty board
-    // send signal to find game
-
-    // console.log('client: emitting findGame()');
-    // this.socket.emit(ClientActionType.FindGame, {
-    //   color: this.getRandomColor(),
-    // });
-
     this.socket.on(SocketEventType.Connect, () => {
       this.showServerMessage(SocketEventType.Connect, this.socket.id);
       console.log('client: emit findGame()');

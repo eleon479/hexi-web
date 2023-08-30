@@ -17,21 +17,14 @@ export class Game {
   private isEndTurnButtonDisabled: boolean;
 
   private board: Board;
-  // private client: Client;
 
   constructor() {
     this.clientSocket = {} as Socket<DefaultEventsMap, DefaultEventsMap>;
     this.gameState = {} as GameState;
     this.board = {} as Board;
-    // this.client = {} as Client;
     this.isEndAttackButtonDisabled = true;
     this.isEndTurnButtonDisabled = true;
   }
-
-  // public bind(client: Client): GameController {
-  //   this.client = client;
-  //   return this;
-  // }
 
   public start() {}
 
@@ -41,28 +34,59 @@ export class Game {
   ) {
     this.clientSocket = socket;
     this.gameState = { ...gameState };
-    this.board = new Board(this.gameState.map);
-    this.board.buildCanvas();
 
+    // provide board with map data
+    this.board = new Board(this.gameState.map);
+
+    // build canvas and render
+    this.board.buildCanvas();
     this.update();
 
-    this.board.canvas.addEventListener('click', (event) => {
-      const x = event.offsetX;
-      const y = event.offsetY;
-
-      const { col, row } = this.findTileByCoords(x, y);
-
-      this.handleAction({
-        type: ClientActionType.ClickTile,
-        data: { col, row },
-      });
-    });
+    // add event listeners
+    this.listen();
   }
 
   public update() {
     this.board.render();
   }
 
+  // add event listeners for player actions like clicks, end turn, etc.
+  // which are then handled by handleAction() (and later sent to server)
+  public listen() {
+    this.board.canvas.addEventListener('click', (event) => {
+      const x = event.offsetX;
+      const y = event.offsetY;
+
+      const { col, row } = this.findTileByCoords(x, y);
+
+      // check if any tile was clicked?
+
+      this.handleAction({
+        type: ClientActionType.ClickTile,
+        data: { col, row },
+      });
+    });
+
+    // do we need button handlers here?
+    const endAttack = document.getElementById('endAttack');
+    const endTurn = document.getElementById('endTurn');
+
+    endAttack?.addEventListener('click', () => {
+      this.handleAction({
+        type: ClientActionType.EndAttack,
+        data: null,
+      });
+    });
+
+    endTurn?.addEventListener('click', () => {
+      this.handleAction({
+        type: ClientActionType.EndTurn,
+        data: null,
+      });
+    });
+  }
+
+  //
   public handleEvent() {}
 
   public handleAction(action: ClientAction) {
