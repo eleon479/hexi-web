@@ -7,47 +7,113 @@ import {
   GameMap,
   Player,
   palette,
+  Stage,
 } from './types/client-models';
 
 export class Game {
   private clientSocket: Socket<DefaultEventsMap, DefaultEventsMap>;
   private gameState: GameState;
-
-  private isEndAttackButtonDisabled: boolean;
-  private isEndTurnButtonDisabled: boolean;
-
   private board: Board;
+  private player: Player;
 
   constructor() {
     this.clientSocket = {} as Socket<DefaultEventsMap, DefaultEventsMap>;
     this.gameState = {} as GameState;
     this.board = {} as Board;
-    this.isEndAttackButtonDisabled = true;
-    this.isEndTurnButtonDisabled = true;
+    this.player = {} as Player;
   }
 
   public start() {}
 
   public create(
     gameState: GameState,
-    socket: Socket<DefaultEventsMap, DefaultEventsMap>
+    socket: Socket<DefaultEventsMap, DefaultEventsMap>,
+    player: Player
   ) {
     this.clientSocket = socket;
     this.gameState = { ...gameState };
+    this.player = { ...player };
 
     // provide board with map data
     this.board = new Board(this.gameState.map);
 
     // build canvas and render
     this.board.buildCanvas();
-    this.update();
+    this.updateButtons();
+    this.updateDetails();
+    this.board.render();
 
     // add event listeners
     this.listen();
   }
 
-  public update() {
+  public update(newGameState: GameState, newPlayerState: Player) {
+    console.log('update(): ');
+
+    this.gameState = { ...newGameState };
+    this.player.gameState.availablePower =
+      newPlayerState.gameState.availablePower;
+
+    // update board with new map data from
+    // this.board ...
+
+    this.updateButtons();
+    this.updateDetails();
     this.board.render();
+  }
+
+  public updateButtons() {
+    const endAttack = document.getElementById('endAttack') as HTMLButtonElement;
+    const endTurn = document.getElementById('endTurn') as HTMLButtonElement;
+
+    if (this.gameState.currentPlayer.id === this.player.id) {
+      if (this.gameState.stage === Stage.Attack) {
+        console.log('its my turn: enable attack button');
+        endAttack.removeAttribute('disabled');
+        endTurn.setAttribute('disabled', 'true');
+      } else {
+        console.log('its my turn: enable end turn button');
+        endAttack.setAttribute('disabled', 'true');
+        endTurn.removeAttribute('disabled');
+      }
+    } else {
+      console.log('its not my turn: disable all buttons');
+      endAttack.setAttribute('disabled', 'true');
+      endTurn.setAttribute('disabled', 'true');
+    }
+  }
+
+  public updateDetails() {
+    const myPlayerText = document.getElementById(
+      'my-player'
+    ) as HTMLSpanElement;
+    const currentPlayerText = document.getElementById(
+      'current-player'
+    ) as HTMLSpanElement;
+    const stageText = document.getElementById('stage') as HTMLSpanElement;
+    const powerText = document.getElementById('power') as HTMLSpanElement;
+    const attackHelp = document.getElementById(
+      'details-help-attack'
+    ) as HTMLSpanElement;
+    const allocateHelp = document.getElementById(
+      'details-help-allocate'
+    ) as HTMLSpanElement;
+
+    myPlayerText.innerText = this.player.id;
+    currentPlayerText.innerText = this.gameState.currentPlayer.id;
+    stageText.innerText = this.gameState.stage;
+    powerText.innerText = this.player.gameState.availablePower.toString();
+
+    if (this.gameState.stage === Stage.Attack) {
+      attackHelp.style.display = 'inline';
+      allocateHelp.style.display = 'none';
+    } else if (this.gameState.stage === Stage.Allocate) {
+      attackHelp.style.display = 'none';
+      allocateHelp.style.display = 'inline';
+    } else {
+      attackHelp.style.display = 'none';
+      allocateHelp.style.display = 'none';
+    }
   }
 
   // add event listeners for player actions like clicks, end turn, etc.
@@ -67,18 +133,22 @@ export class Game {
       });
     });
 
-    // do we need button handlers here?
-    const endAttack = document.getElementById('endAttack');
-    const endTurn = document.getElementById('endTurn');
+    const endAttack = document.getElementById('endAttack') as HTMLButtonElement;
+    const endTurn = document.getElementById('endTurn') as HTMLButtonElement;
 
-    endAttack?.addEventListener('click', () => {
+    // endAttack.removeAttribute('disabled');
+    // endTurn.setAttribute('disabled', 'false');
+
+    endAttack.addEventListener('click', () => {
+      console.log('clicked end attack');
       this.handleAction({
         type: ClientActionType.EndAttack,
         data: null,
       });
     });
 
-    endTurn?.addEventListener('click', () => {
+    endTurn.addEventListener('click', () => {
+      console.log('clicked end turn');
       this.handleAction({
         type: ClientActionType.EndTurn,
         data: null,
@@ -86,19 +156,16 @@ export class Game {
     });
   }
 
-  //
-  public handleEvent() {}
-
   public handleAction(action: ClientAction) {
     switch (action.type) {
       case ClientActionType.ClickTile:
         this.handleClick(action.data);
         break;
       case ClientActionType.EndTurn:
-        this.handleEndTurn(action.data);
+        this.handleEndTurn();
         break;
       case ClientActionType.EndAttack:
-        this.handleEndAttack(action.data);
+        this.handleEndAttack();
         break;
       default:
         console.error('Invalid action type', action);
@@ -114,24 +181,34 @@ export class Game {
       col: data.col,
       row: data.row,
       player: this.clientSocket.id,
+      room: this.player.assignedRoom,
     });
   }
 
-  private handleEndTurn(data: any) {
+  private handleEndAttack() {
     // perform client side check?
     // send action to server
-
-    this.clientSocket.emit(ClientActionType.EndTurn, {
-      player: this.clientSocket.id,
-    });
-  }
-
-  private handleEndAttack(data: any) {
-    // perform client side check?
-    // send action to server
+    console.log(
+      `handleEndAttack() - player: ${this.clientSocket.id} - room: ${this.player.assignedRoom}`
+    );
 
     this.clientSocket.emit(ClientActionType.EndAttack, {
       player: this.clientSocket.id,
+      room: this.player.assignedRoom,
+    });
+  }
+
+  private handleEndTurn() {
+    // perform client side check?
+    // send action to server
+
+    console.log(
+      `handleEndTurn() - player: ${this.clientSocket.id} - room: ${this.player.assignedRoom}`
+    );
+
+    this.clientSocket.emit(ClientActionType.EndTurn, {
+      player: this.clientSocket.id,
+      room: this.player.assignedRoom,
     });
   }
 

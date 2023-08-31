@@ -61,25 +61,32 @@ class Client {
     this.socket.on(ServerEventType.GameStarted, (data: GameRoom) => {
       console.log('client: on GameStarted');
 
+      let playerIds = Object.keys(data.players);
+
       const text = `- roomId: ${data.id}
-      - players: ${JSON.stringify(data.players)}
+      - players: [${playerIds.join(', ')}]
       - status: ${data.status}
       - locked: ${data.locked}
+      - isReady: ${data.isReady}
+      - gameState.currentPlayer: ${data.gameState.currentPlayer.id}
+      - stage: ${data.gameState.stage}
       `;
 
       this.showServerMessage(ServerEventType.GameStarted, text);
       this.sync(data);
 
       // start game
-      this.clientGame.create(this.gameState, this.socket);
+      this.clientGame.create(this.gameState, this.socket, this.player);
     });
 
     this.socket.on(ServerEventType.BoardChanged, (data: GameRoom) => {
       console.log('client: on BoardChanged', data);
 
       // sync Client state w/ new Server data
+      this.sync(data);
 
       // update Game state
+      this.clientGame.update(this.gameState, this.player);
 
       // render Game Board
     });
@@ -101,9 +108,9 @@ class Client {
   }
 
   sync(serverState: GameRoom) {
-    this.gameRoom = { ...serverState };
-    this.gameState = { ...serverState.gameState };
-    this.player = { ...serverState.players[this.socket.id] };
+    this.gameRoom = serverState;
+    this.gameState = serverState.gameState;
+    this.player = serverState.players[this.socket.id];
   }
 
   // on(action: ClientAction, handlerFunction: Function) {
@@ -131,10 +138,11 @@ class Client {
     ul?.append(li);
     ul?.appendChild(li);
 
-    console.log(`${type}: ${message}`);
+    // console.log(`${type}: ${message}`);
   }
 }
 
+console.log('client.ts: new Client()!');
 const client = new Client();
 client.connect();
 
