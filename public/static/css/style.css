@@ -237,12 +237,16 @@ button:disabled {
   border-radius: 10px;
 }
 
-#player {
+#my-player {
   color: var(--hexipro-green);
 }
 
+#current-player {
+  color: var(--hexipro-indigo);
+}
+
 #stage {
-  color: var(--hexipro-green);
+  color: var(--hexipro-blue);
 }
 
 #power {

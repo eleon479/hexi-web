@@ -41,7 +41,8 @@
       <div id="details-inner">
         <h3 id="winner"></h3>
         <p>
-          Player: <span id="player">PLAYER</span><br />
+          My Player: <span id="my-player">MY PLAYER</span><br />
+          Player: <span id="current-player">PLAYER</span>'s Turn<br />
           Stage: <span id="stage">STAGE</span><br />
           Power: <span id="power">POWER</span>
         </p>
@@ -57,15 +58,22 @@
           </span>
         </span>
 
-        <span id="details-log">
+        <!-- <span id="details-log">
           <ul id="server-messages"></ul>
-        </span>
+        </span> -->
 
-        <button id="resetGame" class="reset-game control">Reset Game</button>
+        <!-- <button id="resetGame" class="reset-game control">Reset Game</button> -->
       </div>
     </div>
 
     <script type="text/javascript">
+      console.log('index.html: script tag in body');
+      const endAttackButton = document.getElementById('endAttack');
+      const endTurnButton = document.getElementById('endTurn');
+
+      endAttackButton.setAttribute('disabled', true);
+      endTurnButton.setAttribute('disabled', true);
+
       const detailsPanel = document.getElementById('details-inner');
       const detailsToggle = document.getElementById('details-toggle');
       const detailsToggleLabel = document.getElementById(
